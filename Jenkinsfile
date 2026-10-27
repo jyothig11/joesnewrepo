@@ -1,3 +1,4 @@
+
 pipeline {
     agent any
 
@@ -32,17 +33,35 @@ pipeline {
             steps {
                 sh '''
                     docker rm -f jyothi-cicd-container || true
-                    docker run -d --name jyothi-cicd-container \
-                        -p 8081:8080 jyothi-cicd-app:latest
+
+                    docker run -d \
+                        --name jyothi-cicd-container \
+                        -p 8081:8080 \
+                        jyothi-cicd-app:latest
                 '''
             }
         }
 
         stage('Verify Deployment') {
             steps {
-                sh 'sleep 3'
-                sh 'python3 -m py_compile app.py'
+                sh '''
+                    for i in $(seq 1 10); do
+                        if curl -fsS --max-time 3 \
+                            http://127.0.0.1:8081; then
+                            echo "Deployment verification successful"
+                            exit 0
+                        fi
+
+                        echo "Waiting for application..."
+                        sleep 2
+                    done
+
+                    echo "Application verification failed"
+                    docker logs jyothi-cicd-container
+                    exit 1
+                '''
             }
         }
     }
 }
+
