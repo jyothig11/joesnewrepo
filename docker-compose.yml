@@ -1,6 +1,7 @@
+
 services:
   user-service:
-    image: user-service:v1
+    image: 448079094136.dkr.ecr.us-east-1.amazonaws.com/user-service:${IMAGE_TAG:-v1}
     expose:
       - "5001"
     restart: unless-stopped
@@ -11,7 +12,7 @@ services:
       retries: 3
 
   product-service:
-    image: product-service:v1
+    image: 448079094136.dkr.ecr.us-east-1.amazonaws.com/product-service:${IMAGE_TAG:-v1}
     expose:
       - "5002"
     restart: unless-stopped
@@ -22,7 +23,7 @@ services:
       retries: 3
 
   order-service:
-    image: order-service:v1
+    image: 448079094136.dkr.ecr.us-east-1.amazonaws.com/order-service:${IMAGE_TAG:-v1}
     expose:
       - "5003"
     restart: unless-stopped

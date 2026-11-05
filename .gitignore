@@ -17,3 +17,11 @@ credentials.*
 # Python cache
 __pycache__/
 *.pyc
+
+# Terraform generated files and state
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.tfvars
+*.tfvars.json
