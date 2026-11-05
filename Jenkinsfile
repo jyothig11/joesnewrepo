@@ -1,10 +1,8 @@
-
 pipeline {
     agent any
 
     environment {
         AWS_REGION = 'us-east-1'
-        AWS_ACCOUNT_ID = '448079094136'
         ECR_REGISTRY = '448079094136.dkr.ecr.us-east-1.amazonaws.com'
         IMAGE_TAG = "build-${BUILD_NUMBER}"
     }
@@ -74,10 +72,16 @@ pipeline {
         stage('Deploy Application') {
             steps {
                 sh '''
-                    IMAGE_TAG=${IMAGE_TAG} docker compose -p joesnewrepo pull \
+                    IMAGE_TAG="${IMAGE_TAG}" docker compose \
+                        -f "$WORKSPACE/docker-compose.yml" \
+                        --project-directory "$WORKSPACE" \
+                        -p joesnewrepo pull \
                         user-service product-service order-service
 
-                    IMAGE_TAG=${IMAGE_TAG} docker compose -p joesnewrepo up -d --no-build
+                    IMAGE_TAG="${IMAGE_TAG}" docker compose \
+                        -f "$WORKSPACE/docker-compose.yml" \
+                        --project-directory "$WORKSPACE" \
+                        -p joesnewrepo up -d --no-build
                 '''
             }
         }
@@ -99,7 +103,12 @@ pipeline {
 
                         if [ "$success" != "true" ]; then
                             echo "Deployment verification failed: $path"
-                            docker compose -p joesnewrepo logs --tail=100
+
+                            docker compose \
+                                -f "$WORKSPACE/docker-compose.yml" \
+                                --project-directory "$WORKSPACE" \
+                                -p joesnewrepo logs --tail=100
+
                             exit 1
                         fi
                     done
@@ -120,4 +129,3 @@ pipeline {
         }
     }
 }
-
